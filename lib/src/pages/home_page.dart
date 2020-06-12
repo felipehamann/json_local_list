@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lista_estatica/providers/estudiantes_provider.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 
 class HomePage extends StatelessWidget {
   
-  final listaEstudiantes = ['Estudiante 1','Estudiante 2','Estudiante 3'];
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +30,7 @@ class HomePage extends StatelessWidget {
                 child: Text('Estudiantes',style: TextStyle(fontSize: 25.0),),
               ),
               Expanded(
-                child: ListView(
-                      children: _cargarListaEstudiantes()
-                ),
+                child: _crearListaEstudiantes(),
               )
             ],
           ),
@@ -39,18 +39,33 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  List<Widget> _cargarListaEstudiantes(){
-    List<Widget>  lista = new List<Widget>();
+  Widget _crearListaEstudiantes(){
+    var provider = new EstudiantesProvider();
 
-    for (var i = 0; i < listaEstudiantes.length; i++) {
+    return FutureBuilder(
+      future: provider.cargarDatosEstudiantes(),
+      builder: (context,snapshot){
+        return ListView(
+          children: _crearElementosListaEstudiantes(snapshot.data),
+        );
+      }
+    
+    );
+  }
+
+  List<Widget> _crearElementosListaEstudiantes(List<dynamic> datos){
+    final List<Widget> lista = new List<Widget>();
+
+    for (var estudiante in datos) {
       lista.add(
-        ListTile(
-          leading: Icon(Icons.account_circle),
-          title: Text(listaEstudiantes[i]),
+        ListTile( 
+          title: Text(estudiante['first_name']+' '+estudiante['last_name']),
+          subtitle: Text(estudiante['email']),
+          leading: Icon(estudiante['gender']=='Male'?MdiIcons.genderMale:MdiIcons.genderMaleFemale),
         )
       );
       lista.add(Divider());
     }
-    return lista; 
+    return lista;
   }
 }
